@@ -1,12 +1,17 @@
-const saveDataToGzip = require('./src/utils/ZlibHelper');
-const { generateStatistics } = require('./src/utils/statistics');
-const DataExtractor = require('./src/api/dataExtractor');
 
 import('node-fetch').then(({ default: fetch }) => {
+  
+  const saveDataToGzip = require('./src/utils/ZlibHelper');
+  const { generateStatistics } = require('./src/utils/statistics');
+  const DataExtractor = require('./src/api/dataExtractor');
+
+    // Proxy URL (if needed  )
+    const proxyUrl = '';
+
 
   // Start the extraction process
   async function startExtraction() {
-    const extractor = new DataExtractor(fetch);
+    const extractor = proxyUrl ? new DataExtractor(proxyUrl) : new DataExtractor();
     const num_pages = 10;
     const extractedData = [];
 

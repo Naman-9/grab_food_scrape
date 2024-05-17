@@ -1,5 +1,7 @@
+const HttpsProxyAgent = require('https-proxy-agent');
+
 class DataExtractor {
-  constructor() {
+  constructor(proxyUrl = null) {
     this.apiEndpoint = 'https://portal.grab.com/foodweb/v2/search';
     this.requestHeaders = {
       accept: 'application/json, text/plain, /',
@@ -20,6 +22,7 @@ class DataExtractor {
       'x-gfc-country': 'SG',
       'x-grab-web-app-version': '~OYFo45UHckSfgUM6xfyV',
     };
+    this.proxyAgent = proxyUrl ? new HttpsProxyAgent(proxyUrl) : null;
   }
 
   async fetch_data(offset) {
@@ -36,14 +39,20 @@ class DataExtractor {
 
       console.info('Fetching data');
 
-      // fetching data
-      const response = await fetch(this.apiEndpoint, {
+      const fetchOptions = {
         method: 'POST',
         headers: this.requestHeaders,
         body: payload,
-      });
-
+      };
+      
+      if (this.proxyAgent) {
+        fetchOptions.agent = this.proxyAgent;
+      }
+      
+      // fetching data
+      const response = await fetch(this.apiEndpoint, fetchOptions);
       const res_json = await response.json();
+
 
       if (!res_json.searchResult?.searchMerchants) {
         console.log("---Unable to fetch Data.---");
